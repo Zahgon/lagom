@@ -41,9 +41,9 @@ def bind_to_container(
     container: Container, shared: Optional[List[Type]] = None
 ) -> Callable[[Callable[..., R]], Callable[..., R]]:
     def _decorator(func):
-        pass
+        raise NotImplementedError
 
-    return _decorator
+    raise NotImplementedError
 
 
 def magic_bind_to_container(
@@ -62,9 +62,9 @@ def magic_bind_to_container(
     """
 
     def _decorator(func):
-        pass
+        raise NotImplementedError
 
-    return _decorator
+    raise NotImplementedError
 
 
 def dependency_definition(container: Container, singleton: bool = False):
@@ -83,9 +83,9 @@ def dependency_definition(container: Container, singleton: bool = False):
     """
 
     def _decorator(func):
-        pass
+        raise NotImplementedError
 
-    return _decorator
+    raise NotImplementedError
 
 
 def context_dependency_definition(container: Container):
@@ -113,9 +113,9 @@ def context_dependency_definition(container: Container):
     """
 
     def _decorator(func):
-        pass
+        raise NotImplementedError
 
-    return _decorator
+    raise NotImplementedError
 
 
 def _extract_definition_func_and_type(
@@ -127,21 +127,8 @@ def _extract_definition_func_and_type(
     :return:
     """
 
-    return_type = reflect(func).return_type
-    if not return_type:
-        raise MissingReturnType(
-            f"Function {func.__name__} used as a definition must have a return type"
-        )
-    if inspect.iscoroutinefunction(func):
-        return async_construction(func), return_type
-    if not inspect.isgeneratorfunction(func) and not inspect.isasyncgenfunction(func):
-        return construction(func), return_type
-
-    return (
-        yielding_construction(func),
-        _generator_type(return_type),
-    )
+    raise NotImplementedError
 
 
 def _generator_type(return_type):
-    return return_type.__args__[0]  # todo: something less hacky
+    raise NotImplementedError

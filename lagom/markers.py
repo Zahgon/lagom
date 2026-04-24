@@ -23,7 +23,7 @@ class Injectable:
         is a singleton.
         :return:
         """
-        return self
+        raise NotImplementedError
 
     def __deepcopy__(self, memodict=None):
         """
@@ -31,7 +31,7 @@ class Injectable:
         is a singleton.
         :return:
         """
-        return self
+        raise NotImplementedError
 
     def __getattr__(self, item: str):
         """
@@ -41,11 +41,7 @@ class Injectable:
         """
         # Ignore dunder methods as it's likely some decorator magic and
         # it doesn't really help to raise an exception then.
-        if item.startswith("__") and item.endswith("__"):
-            return None
-        raise InjectableNotResolved(
-            f"Cannot get {item} on injectable. Make sure the function was bound to a container instance"
-        )
+        raise NotImplementedError
 
 
 # singleton object used to indicate that an argument should be injected

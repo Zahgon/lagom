@@ -133,23 +133,7 @@ class Container(
         # ContainerDebugInfo is always registered
         # This means consumers can consume an overview of the container
         # without hacking anything custom together.
-        self._registered_types = {
-            ContainerDebugInfo: ConstructionWithoutContainer(lambda: self)
-        }
-
-        if container:
-            self._parent_definitions = container
-            self._reflector = container._reflector
-        else:
-            self._parent_definitions = EmptyDefinitionSet()
-            self._reflector = CachingReflector()
-
-        if not log_undefined_deps:
-            self._undefined_logger = NullLogger()
-        elif log_undefined_deps is True:
-            self._undefined_logger = logging.getLogger(__name__)
-        else:
-            self._undefined_logger = cast(logging.Logger, log_undefined_deps)
+        raise NotImplementedError
 
     def define(self, dep: Type[X], resolver: TypeResolver[X]) -> SpecialDepDefinition:
         """Register how to construct an object of type X
@@ -163,27 +147,7 @@ class Container(
         :param resolver: A definition of how to construct it
         :return:
         """
-        if dep in UNRESOLVABLE_TYPES:
-            raise InvalidDependencyDefinition()
-        if dep in self._registered_types:
-            raise DuplicateDefinition()
-        if dep is resolver:
-            # This is a special case for things like container[Foo] = Foo
-            return self.define(dep, Alias(dep, skip_definitions=True))
-        definition = normalise(resolver)
-        self._registered_types[dep] = definition
-        self._registered_types[Optional[dep]] = definition  # type: ignore
-
-        # For awaitables we add a convenience exception to be thrown if code hints on the type
-        # without the awaitable.
-        awaitable_type = remove_awaitable_type(dep)
-        if awaitable_type:
-            # Unless there's already a sync version defined.
-            if awaitable_type not in self.defined_types:
-                self._registered_types[awaitable_type] = UnresolvableTypeDefinition(
-                    TypeOnlyAvailableAsAwaitable(awaitable_type), awaitable_type
-                )
-        return definition
+        raise NotImplementedError
 
     @property
     def defined_types(self) -> Set[Type]:
@@ -214,12 +178,7 @@ class Container(
         :param singletons: items which should be considered singletons within the context
         :return:
         """
-        updater = (
-            functools.partial(update_container_singletons, singletons=singletons)
-            if singletons
-            else None
-        )
-        return _TemporaryInjectionContext(self, updater)
+        raise NotImplementedError
 
     def resolve(
         self, dep_type: Type[X], suppress_error=False, skip_definitions=False
@@ -252,9 +211,7 @@ class Container(
         :param skip_definitions:
         :return:
         """
-        return self._resolve(
-            dep_type, suppress_error, skip_definitions, type_stack=set()
-        )
+        raise NotImplementedError
 
     def _resolve(
         self,
@@ -264,18 +221,7 @@ class Container(
         default: X = Unset,
         type_stack: Optional[Set[Type]] = None,
     ) -> X:
-        if not skip_definitions:
-            definition = self.get_definition(dep_type)
-            if definition:
-                return definition.get_instance(self)
-
-        optional_dep_type = remove_optional_type(dep_type)
-        if optional_dep_type:
-            return self.resolve(optional_dep_type, suppress_error=True)
-
-        return self._reflection_build_with_err_handling(
-            dep_type, suppress_error, default=default, type_stack=type_stack
-        )
+        raise NotImplementedError
 
     def partial(
         self,
@@ -300,19 +246,10 @@ class Container(
         :param container_updater: An optional callable to update the container before resolution
         :return:
         """
-        spec = self._get_spec_without_self(func)
-        keys_to_bind = (
-            key for (key, arg) in spec.defaults.items() if arg is injectable
-        )
-        keys_and_types = [(key, spec.annotations[key]) for key in keys_to_bind]
-
-        _injection_context = self.temporary_singletons(shared)
-        update_container = container_updater if container_updater else _update_nothing
-
         def _update_args(supplied_args, supplied_kwargs):
-            pass
+            raise NotImplementedError
 
-        return apply_argument_updater(func, _update_args, spec)
+        raise NotImplementedError
 
     def magic_partial(
         self,
@@ -340,21 +277,16 @@ class Container(
         :param container_updater: An optional callable to update the container before resolution
         :return:
         """
-        spec = self._get_spec_without_self(func)
-
-        update_container = container_updater if container_updater else _update_nothing
-        _injection_context = self.temporary_singletons(shared)
-
         def _update_args(supplied_args, supplied_kwargs):
-            pass
+            raise NotImplementedError
 
-        return apply_argument_updater(func, _update_args, spec, catch_errors=True)
+        raise NotImplementedError
 
     def clone(self) -> "Container":
         """returns a copy of the container
         :return:
         """
-        return Container(self, log_undefined_deps=self._undefined_logger)
+        raise NotImplementedError
 
     def get_definition(self, dep_type: Type[X]) -> Optional[SpecialDepDefinition[X]]:
         """
@@ -364,16 +296,13 @@ class Container(
         :param dep_type:
         :return:
         """
-        definition = self._registered_types.get(dep_type, Unset)
-        if definition is Unset:
-            return self._parent_definitions.get_definition(dep_type)
-        return definition
+        raise NotImplementedError
 
     def __getitem__(self, dep: Type[X]) -> X:
-        return self.resolve(dep)
+        raise NotImplementedError
 
     def __setitem__(self, dep: Type[X], resolver: TypeResolver[X]):
-        self.define(dep, resolver)
+        raise NotImplementedError
 
     def _reflection_build_with_err_handling(
         self,
@@ -383,16 +312,7 @@ class Container(
         default: X = Unset,
         type_stack: Optional[Set[Type]] = None,
     ) -> X:
-        try:
-            return self._reflection_build(
-                dep_type, default=default, type_stack=type_stack
-            )
-        except UnresolvableType as inner_error:
-            if not suppress_error:
-                raise UnresolvableType(dep_type) from inner_error
-            return None  # type: ignore
-        except RecursionError as recursion_error:
-            raise RecursiveDefinitionError(dep_type) from recursion_error
+        raise NotImplementedError
 
     def _reflection_build(
         self,
@@ -401,26 +321,7 @@ class Container(
         default: X = Unset,
         type_stack: Optional[Set[Type]] = None,
     ) -> X:
-        type_stack = set(type_stack or [])
-        if dep_type in type_stack:
-            raise CircularDefinitionError(dep_type, type_stack)
-        type_stack.add(dep_type)
-        self._undefined_logger.warning(
-            f"Undefined dependency. Using reflection for {dep_type}",
-            extra={"undefined_dependency": dep_type},
-        )
-        spec = self._reflector.get_function_spec(dep_type.__init__)
-        if dep_type in UNRESOLVABLE_TYPES:
-            if default is not Unset:
-                return default
-            raise UnresolvableType(dep_type)
-        sub_deps = self._infer_dependencies(
-            spec, types_to_skip={dep_type}, type_stack=type_stack
-        )
-        try:
-            return dep_type(**sub_deps)  # type: ignore
-        except TypeError as type_error:
-            raise UnresolvableType(dep_type) from type_error
+        raise NotImplementedError
 
     def _infer_dependencies(
         self,
@@ -431,29 +332,10 @@ class Container(
         types_to_skip: Optional[Set[Type]] = None,
         type_stack: Optional[Set[Type]] = None,
     ):
-        dep_keys_to_skip: List[str] = []
-        dep_keys_to_skip.extend(spec.args[0:skip_pos_up_to])
-        dep_keys_to_skip.extend(keys_to_skip or [])
-        types_to_skip = types_to_skip or set()
-        sub_deps = {
-            key: self._resolve(
-                sub_dep_type,
-                suppress_error=suppress_error,
-                default=spec.defaults.get(key, Unset),
-                type_stack=type_stack,
-            )
-            for (key, sub_dep_type) in spec.annotations.items()
-            if sub_dep_type != Any
-            and (key not in dep_keys_to_skip)
-            and (sub_dep_type not in types_to_skip)
-        }
-        return {key: dep for (key, dep) in sub_deps.items() if dep is not None}
+        raise NotImplementedError
 
     def _get_spec_without_self(self, func: Callable[..., X]) -> FunctionSpec:
-        if isinstance(func, (FunctionType, MethodType)):
-            return self._reflector.get_function_spec(func)
-        t = cast(Type[X], func)
-        return self._reflector.get_function_spec(t.__init__).without_argument("self")
+        raise NotImplementedError
 
 
 @mypyc_attr(allow_interpreted_subclasses=True)
@@ -461,32 +343,16 @@ class ExplicitContainer(Container):
     def resolve(
         self, dep_type: Type[X], suppress_error=False, skip_definitions=False
     ) -> X:
-        definition = self.get_definition(dep_type)
-        if not definition:
-            if suppress_error:
-                return None  # type: ignore
-            raise DependencyNotDefined(dep_type)
-        return definition.get_instance(self)
+        raise NotImplementedError
 
     def define(self, dep, resolver):
-        definition = super().define(dep, resolver)
-        if isinstance(definition, Alias):
-            raise InvalidDependencyDefinition(
-                "Aliases are not valid in an explicit container"
-            )
-        if isinstance(definition, Singleton) and isinstance(
-            definition.singleton_type, Alias
-        ):
-            raise InvalidDependencyDefinition(
-                "Aliases are not valid inside singletons in an explicit container"
-            )
-        return definition
+        raise NotImplementedError
 
     def clone(self):
         """returns a copy of the container
         :return:
         """
-        return ExplicitContainer(self, log_undefined_deps=self._undefined_logger)
+        raise NotImplementedError
 
 
 class EmptyDefinitionSet(DefinitionsSource):
@@ -516,16 +382,10 @@ class _TemporaryInjectionContext:
         container: Container,
         update_function: Optional[Callable[[Container], Container]] = None,
     ):
-        self._base_container = container
-        if update_function:
-            self._build_temporary_container = lambda: update_function(
-                self._base_container
-            )
-        else:
-            self._build_temporary_container = lambda: self._base_container.clone()
+        raise NotImplementedError
 
     def __enter__(self) -> Container:
-        return self._build_temporary_container()
+        raise NotImplementedError
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass

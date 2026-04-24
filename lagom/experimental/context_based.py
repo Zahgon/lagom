@@ -41,17 +41,10 @@ class AwaitableSingleton(Generic[T]):
     _lock: Lock
 
     def __init__(self, constructor: ConstructionWithContainer, container: Container):
-        self.instance = None
-        self.constructor = constructor  # type: ignore
-        self.container = container
-        self._lock = Lock()
+        raise NotImplementedError
 
     async def get(self) -> T:
-        if not self.instance:
-            async with self._lock:
-                if not self.instance:
-                    self.instance = await self.constructor.get_instance(self.container)
-        return self.instance
+        raise NotImplementedError
 
 
 class AsyncContextContainer(Container):
@@ -67,49 +60,19 @@ class AsyncContextContainer(Container):
         context_singletons: Collection[Type] = tuple(),
         log_undefined_deps: Union[bool, logging.Logger] = False,
     ):
-        super().__init__(container, log_undefined_deps)
-        self._context_types = set(context_types)
-        self._context_singletons = set(context_singletons)
+        raise NotImplementedError
 
     def clone(self) -> "AsyncContextContainer":
         """returns a copy of the container
         :return:
         """
-        return AsyncContextContainer(
-            self,
-            context_types=self._context_types,
-            context_singletons=self._context_singletons,
-            log_undefined_deps=self._undefined_logger,
-        )
+        raise NotImplementedError
 
     async def __aenter__(self):
-        if not self.async_exit_stack and self._root_context:
-            self.async_exit_stack = AsyncExitStack()
-
-        if self.async_exit_stack and self._root_context:
-            # All actual context definitions happen on a clone so that there's isolation between invocations
-            in_context = self.clone()
-            in_context.async_exit_stack = AsyncExitStack()
-            in_context._root_context = False
-
-            for dep_type in self._context_types:
-                managed_dep = self._context_type_def(dep_type)
-                key = Awaitable[dep_type] if isinstance(managed_dep, AsyncConstructionWithContainer) else dep_type  # type: ignore
-                in_context[key] = managed_dep  # type: ignore
-            for dep_type in self._context_singletons:
-                managed_singleton = self._singleton_type_def(dep_type)
-                key = AwaitableSingleton[dep_type] if isinstance(managed_singleton, AwaitableSingleton) else dep_type  # type: ignore
-                in_context[key] = managed_singleton  # type: ignore
-
-            # The parent context manager keeps track of the inner clone
-            await self.async_exit_stack.enter_async_context(in_context)
-            return in_context
-        return self
+        raise NotImplementedError
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.async_exit_stack:
-            await self.async_exit_stack.aclose()
-            self.async_exit_stack = None
+        raise NotImplementedError
 
     def partial(
         self,
@@ -117,15 +80,10 @@ class AsyncContextContainer(Container):
         shared: Optional[List[Type]] = None,
         container_updater: Optional[CallTimeContainerUpdate] = None,
     ) -> Callable[..., X]:
-        if not inspect.iscoroutinefunction(func):
-            raise MissingFeature(
-                "AsyncContextManager currently can only deal with async functions"
-            )
+        async def _with_context():
+            raise NotImplementedError
 
-        async def _with_context(*args, **kwargs):
-            pass
-
-        return _with_context
+        raise NotImplementedError
 
     def magic_partial(
         self,
@@ -135,15 +93,10 @@ class AsyncContextContainer(Container):
         skip_pos_up_to: int = 0,
         container_updater: Optional[CallTimeContainerUpdate] = None,
     ) -> Callable[..., X]:
-        if not inspect.iscoroutinefunction(func):
-            raise MissingFeature(
-                "AsyncContextManager currently can only deal with async functions"
-            )
+        async def _with_context():
+            raise NotImplementedError
 
-        async def _with_context(*args, **kwargs):
-            pass
-
-        return _with_context
+        raise NotImplementedError
 
     def _context_type_def(self, dep_type: Type):
         pass

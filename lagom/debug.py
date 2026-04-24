@@ -11,7 +11,7 @@ def get_commit_hash():
 
 
 def get_build_info():
-    return {"version": version.__version__, "commit_hash": get_commit_hash()}
+    raise NotImplementedError
 
 
 if __name__ == "__main__":

@@ -3,4 +3,4 @@ try:
 except:
 
     def mypyc_attr(*attrs, **kwattrs):  # type: ignore
-        return lambda x: x
+        raise NotImplementedError

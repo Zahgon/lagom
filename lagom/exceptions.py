@@ -37,11 +37,7 @@ class ClassesCannotBeDecorated(SyntaxError, LagomException):
     dep_type: str
 
     def __init__(self):
-        super().__init__(
-            "Decorating classes is not supported by lagom. \n"
-            "Alternative is to create a factory method and use that: \n"
-            "factory_func = container.partial(ClassName)"
-        )
+        raise NotImplementedError
 
 
 class MissingReturnType(SyntaxError, LagomException):
@@ -66,12 +62,7 @@ class TypeOnlyAvailableAsAwaitable(SyntaxError, LagomException):
 
         :param dep_type: The type that could not be constructed without Awaitable
         """
-        self.dep_type = _dep_type_as_string(dep_type)
-        if inspect.isabstract(dep_type):
-            super().__init__(
-                f"Unable to construct type {self.dep_type} as it is only available as an async."
-                "Try requesting Awaitable[{self.dep_type}] instead"
-            )
+        raise NotImplementedError
 
 
 class UnableToInvokeBoundFunction(TypeError, LagomException):
@@ -80,11 +71,7 @@ class UnableToInvokeBoundFunction(TypeError, LagomException):
     unresolvable_deps: typing.List[Type]
 
     def __init__(self, msg, unresolvable_deps):
-        self.unresolvable_deps = unresolvable_deps
-        unresolvable_string_list = ",".join(d.__name__ for d in unresolvable_deps)
-        super().__init__(
-            f"{msg}. The container could not construct the following types: {unresolvable_string_list}"
-        )
+        raise NotImplementedError
 
 
 class UnresolvableType(ValueError, LagomException):
@@ -97,20 +84,10 @@ class UnresolvableType(ValueError, LagomException):
 
         :param dep_type: The type that could not be constructed
         """
-        self.dep_type = _dep_type_as_string(dep_type)
-        if inspect.isabstract(dep_type):
-            super().__init__(
-                f"Unable to construct Abstract type {self.dep_type}."
-                "Try defining an alias or a concrete class to construct"
-            )
-        else:
-            super().__init__(
-                f"Unable to construct dependency of type {self.dep_type} "
-                "The constructor probably has some unresolvable dependencies"
-            )
+        raise NotImplementedError
 
     def __str__(self):
-        return f"{super().__str__()}: {str.join(' => ', self.get_unresolvable_deps_sequence())}"
+        raise NotImplementedError
 
     def get_unresolvable_deps_sequence(self) -> typing.List[str]:
         """Returns the dependency stack with the last element being the dependency source of the exception"""
@@ -123,8 +100,7 @@ class TypeResolutionBlocked(UnresolvableType):
     dep_type: str
 
     def __init__(self, dep_type: typing.Optional[typing.Type], msg: str):
-        self.dep_type = _dep_type_as_string(dep_type) if dep_type else ""
-        super(ValueError, self).__init__(msg)
+        raise NotImplementedError
 
 
 class CircularDefinitionError(RuntimeError, LagomException):
@@ -135,14 +111,7 @@ class CircularDefinitionError(RuntimeError, LagomException):
         """
         :param dep_type: The type that could not be constructed
         """
-        self.dep_type = dep_type
-        self.type_stack = type_stack
-
-        type_stack_string = ", ".join([_dep_type_as_string(t) for t in type_stack])
-        super().__init__(
-            f"When trying to build dependency of type '{_dep_type_as_string(dep_type)}' lagom needed the same type. Types being built: '{type_stack_string}'"
-            "This could indicate a circular definition somewhere."
-        )
+        raise NotImplementedError
 
 
 class RecursiveDefinitionError(SyntaxError, LagomException):
@@ -154,11 +123,7 @@ class RecursiveDefinitionError(SyntaxError, LagomException):
         """
         :param dep_type: The type that could not be constructed
         """
-        self.dep_type = dep_type
-        super().__init__(
-            f"When trying to build dependency of type '{_dep_type_as_string(dep_type)}' python hit a recursion limit. "
-            "This could indicate a circular definition somewhere."
-        )
+        raise NotImplementedError
 
 
 class DependencyNotDefined(ValueError, LagomException):
@@ -170,11 +135,7 @@ class DependencyNotDefined(ValueError, LagomException):
         """
         :param dep_type: The type that was not defined
         """
-        self.dep_type = dep_type
-        super().__init__(
-            f"{_dep_type_as_string(dep_type)} has not been defined. "
-            f"In an explict container all dependencies must be defined"
-        )
+        raise NotImplementedError
 
 
 class MissingEnvVariable(LagomException):
@@ -184,9 +145,7 @@ class MissingEnvVariable(LagomException):
     """
 
     def __init__(self, variable_names: typing.List[str]):
-        super().__init__(
-            f"Expected environment variables not found: {', '.join(variable_names)}"
-        )
+        raise NotImplementedError
 
 
 class InvalidEnvironmentVariables(LagomException):
@@ -198,9 +157,7 @@ class InvalidEnvironmentVariables(LagomException):
     """
 
     def __init__(self, variable_names: typing.List[str], details: str):
-        super().__init__(
-            f"Unable to load environment variables: {', '.join(variable_names)} \n {details}"
-        )
+        raise NotImplementedError
 
 
 class MissingFeature(LagomException):

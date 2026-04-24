@@ -14,10 +14,10 @@ class PlainFunction(SpecialDepDefinition[X]):
 
     def __init__(self, callable_func: X):
         """"""
-        self.callable_func = callable_func
+        raise NotImplementedError
 
     def get_instance(self, _container: ReadableContainer) -> X:
-        return self.callable_func
+        raise NotImplementedError
 
 
 class AsyncConstructionWithContainer(ConstructionWithContainer):

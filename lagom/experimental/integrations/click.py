@@ -29,9 +29,7 @@ class ClickIO:
         pass
 
     def __getattr__(self, item):
-        import click
-
-        return getattr(click, item)
+        raise NotImplementedError
 
 
 class ClickIntegration:
@@ -47,9 +45,7 @@ class ClickIntegration:
         container: ExtendableContainer,
         execution_singletons: Optional[List[Type]] = None,
     ):
-        self._container = container.clone()
-        self._container[ClickIO] = ClickIO()
-        self._execution_singletons = execution_singletons or []
+        raise NotImplementedError
 
     def command(
         self, name=None, cls=None, **attrs
@@ -65,9 +61,9 @@ class ClickIntegration:
         """
 
         def _decorator(f):
-            pass
+            raise NotImplementedError
 
-        return _decorator
+        raise NotImplementedError
 
     @staticmethod
     def option(*param_decls, **attrs):
@@ -87,10 +83,8 @@ class ClickIntegration:
         :param attrs:
         :return:
         """
-        return decorators.argument(*param_decls, **attrs)
+        raise NotImplementedError
 
     def __getattr__(self, item):
         # Any method not explicitly code just gets passed to click
-        import click
-
-        return getattr(click, item)
+        raise NotImplementedError

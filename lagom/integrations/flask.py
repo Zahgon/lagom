@@ -42,21 +42,23 @@ class FlaskIntegration:
         :param request_singletons: A list of types that should be singletons for a request
         :param container: an existing container to provide dependencies
         """
-        self.flask_app = app
-        self._container = container.clone()
-        self._container[Request] = ConstructionWithoutContainer(lambda: request)
-        self._request_singletons = request_singletons or []
-        self._injection_map = {}
+        raise NotImplementedError
 
     def route(self, rule, **options):
         """Equivalent to the flask @route decorator
         Injectable arguments should be set by making the default value
         lagom.injectable
         """
+        def _decorator(f):
+            raise NotImplementedError
+
         pass
 
     def magic_route(self, rule, **options):
         """Equivalent to the flask @route decorator
         The injection container will try and bind all arguments
         """
+        def _decorator(f):
+            raise NotImplementedError
+
         pass

@@ -58,42 +58,7 @@ class Env(ABC, BaseModel):
 
         :param kwargs:
         """
-        try:
-            if len(kwargs) == 0:
-                prefix = self._prefix()
-                envs = os.environ.items()
-                super().__init__(
-                    **{
-                        key.replace(prefix, "").lower(): value
-                        for (key, value) in envs
-                        if key.startswith(prefix)
-                    }
-                )
-            else:
-                super().__init__(**kwargs)
-        except ValidationError as validation_error:
-            if _is_pydantic_v1:
-                missing_field_errors = [
-                    e
-                    for e in validation_error.errors()
-                    if e["type"] == "value_error.missing"
-                ]
-            else:
-                missing_field_errors = [
-                    e for e in validation_error.errors() if e["type"] == "missing"
-                ]
-            if missing_field_errors:
-                env_names = self._env_names_from_pydantic_errors(missing_field_errors)
-                raise MissingEnvVariable(env_names) from validation_error
-            other_field_errors = [
-                e
-                for e in validation_error.errors()
-                if e["type"] != "value_error.missing"
-            ]
-            env_names = self._env_names_from_pydantic_errors(other_field_errors)
-            raise InvalidEnvironmentVariables(
-                env_names, str(validation_error)
-            ) from validation_error
+        raise NotImplementedError
 
     def _env_names_from_pydantic_errors(self, missing_field_errors):
         pass

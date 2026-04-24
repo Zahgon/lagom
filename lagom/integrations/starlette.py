@@ -41,8 +41,7 @@ class StarletteIntegration:
         :param request_singletons: List of types that will be singletons for a request
         :param container:
         """
-        self._request_singletons = request_singletons or []
-        self._container = container
+        raise NotImplementedError
 
     def route(
         self,
@@ -144,6 +143,12 @@ class StarletteIntegration:
         :param partial_provider:
         :param request_singletons:
         """
+        def __init__(self, scope, receive, send):
+            raise NotImplementedError
+
+        def __getattribute__(self, name):
+            raise NotImplementedError
+
         pass
 
     @staticmethod
@@ -159,4 +164,10 @@ class StarletteIntegration:
         :param partial_provider:
         :param request_singletons:
         """
+        def __init__(self, scope, receive, send):
+            raise NotImplementedError
+
+        def __getattribute__(self, name):
+            raise NotImplementedError
+
         pass

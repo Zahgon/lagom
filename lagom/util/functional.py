@@ -16,7 +16,7 @@ def arity(func: Callable) -> int:
     :param func:
     :return:
     """
-    return len(inspect.signature(func).parameters)
+    raise NotImplementedError
 
 
 F = TypeVar("F", bound=Callable)
@@ -28,24 +28,19 @@ class FunctionCollection(Generic[F]):
     """
 
     def __init__(self, *checkers: F):
-        self._checkers = checkers
-        self.hash = hash(tuple(self._checkers))
+        raise NotImplementedError
 
     def __len__(self) -> int:
-        return len(self._checkers)
+        raise NotImplementedError
 
     def __contains__(self, item) -> bool:
-        return item in self._checkers
+        raise NotImplementedError
 
     def __iter__(self) -> Iterator[F]:
-        return iter(self._checkers)
+        raise NotImplementedError
 
     def __hash__(self):
-        return self.hash
+        raise NotImplementedError
 
     def __eq__(self, other):
-        if isinstance(other, FunctionCollection):
-            return self.hash == other.hash
-        if isinstance(other, list):
-            return tuple(other) == self._checkers
-        return False
+        raise NotImplementedError

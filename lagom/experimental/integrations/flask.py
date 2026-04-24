@@ -34,18 +34,23 @@ class FlaskBlueprintIntegration(FlaskIntegration):
         # A blueprint is not actually a flask app but we can pretend it is for this
         # integration.
         # TODO: Refactor this properly when moving out of experimental
-        super().__init__(blueprint, container, request_singletons)  # type: ignore
-        self.blueprint = blueprint
+        raise NotImplementedError
 
     def route(self, rule, **options):
         """Equivalent to the flask @route decorator
         Injectable arguments should be set by making the default value
         lagom.injectable
         """
+        def _decorator(f):
+            raise NotImplementedError
+
         pass
 
     def magic_route(self, rule, **options):
         """Equivalent to the flask @route decorator
         The injection container will try and bind all arguments
         """
+        def _decorator(f):
+            raise NotImplementedError
+
         pass

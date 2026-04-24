@@ -13,20 +13,10 @@ from .util.reflection import FunctionSpec
 def apply_argument_updater(
     func, argument_updater, spec: FunctionSpec, catch_errors=False
 ):
-    inner_func = func if not catch_errors else _wrap_func_in_error_handling(func, spec)
-    if inspect.iscoroutinefunction(func):
+    async def _bound_func():
+        raise NotImplementedError
 
-        @functools.wraps(func)
-        async def _bound_func(*args, **kwargs):
-            pass
-
-    else:
-
-        @functools.wraps(func)
-        def _bound_func(*args, **kwargs):
-            pass
-
-    return _bound_func
+    raise NotImplementedError
 
 
 def _wrap_func_in_error_handling(func, spec: FunctionSpec):
@@ -38,8 +28,7 @@ def _wrap_func_in_error_handling(func, spec: FunctionSpec):
     :return:
     """
 
-    @functools.wraps(func)
-    def _error_handling_func(*args, **kwargs):
-        pass
+    def _error_handling_func():
+        raise NotImplementedError
 
-    return _error_handling_func
+    raise NotImplementedError

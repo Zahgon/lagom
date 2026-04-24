@@ -58,14 +58,10 @@ class _Managers(Generic[M]):
     """
 
     def __init__(self, model: Type[M]):
-        self.model = model
+        raise NotImplementedError
 
     def __getattr__(self, item) -> Manager:
-        if not hasattr(self.model, item):
-            raise KeyError(
-                f"Django model {self.model.__name__} does not define a property {item}"
-            )
-        return getattr(self.model, item)
+        raise NotImplementedError
 
 
 class _DjangoSettings:
@@ -94,8 +90,7 @@ class DjangoModel(Generic[M]):
 
         :param model: The django model class
         """
-        self.model = model
-        self.managers = _Managers(self.model)
+        raise NotImplementedError
 
     @property
     def objects(self) -> Manager:
@@ -135,13 +130,7 @@ class DjangoIntegration:
         :param request_singletons:
         :param container:
         """
-        self._container = container.clone()
-        self._request_singletons = request_singletons or []
-        self._container.define(
-            DjangoSettings, ConstructionWithoutContainer(self._load_settings)
-        )
-        for model in models or []:
-            self._container.define(DjangoModel[model], DjangoModel(model))  # type: ignore
+        raise NotImplementedError
 
     def bind_view(self, view):
         """

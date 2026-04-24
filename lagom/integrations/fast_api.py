@@ -32,9 +32,7 @@ class FastApiIntegration:
         request_singletons: Optional[List[Type]] = None,
         request_context_singletons: Optional[List[Type]] = None,
     ):
-        self._container = container
-        self._request_singletons = request_singletons or []
-        self._request_context_singletons = request_context_singletons or []
+        raise NotImplementedError
 
     def depends(self, dep_type: Type[T]) -> T:
         """Returns a Depends object which FastAPI understands
@@ -42,6 +40,12 @@ class FastApiIntegration:
         :param dep_type:
         :return:
         """
+        def _container_from_request(request):
+            raise NotImplementedError
+
+        def _resolver(container):
+            raise NotImplementedError
+
         pass
 
     @contextmanager
