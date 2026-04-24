@@ -191,13 +191,11 @@ class Container(
 
         :return:
         """
-        return self._parent_definitions.defined_types.union(
-            self._registered_types.keys()
-        )
+        pass
 
     @property
     def reflection_cache_overview(self) -> Dict[str, str]:
-        return self._reflector.overview_of_cache
+        pass
 
     def temporary_singletons(
         self, singletons: Optional[List[Type]] = None
@@ -312,17 +310,7 @@ class Container(
         update_container = container_updater if container_updater else _update_nothing
 
         def _update_args(supplied_args, supplied_kwargs):
-            keys_to_skip = set(supplied_kwargs.keys())
-            keys_to_skip.update(spec.args[0 : len(supplied_args)])
-            with _injection_context as invocation_container:
-                update_container(invocation_container, supplied_args, supplied_kwargs)
-                kwargs = {
-                    key: invocation_container.resolve(dep_type)
-                    for (key, dep_type) in keys_and_types
-                    if key not in keys_to_skip
-                }
-            kwargs.update(supplied_kwargs)
-            return supplied_args, kwargs
+            pass
 
         return apply_argument_updater(func, _update_args, spec)
 
@@ -358,18 +346,7 @@ class Container(
         _injection_context = self.temporary_singletons(shared)
 
         def _update_args(supplied_args, supplied_kwargs):
-            final_keys_to_skip = (keys_to_skip or []) + list(supplied_kwargs.keys())
-            final_skip_pos_up_to = max(skip_pos_up_to, len(supplied_args))
-            with _injection_context as invocation_container:
-                update_container(invocation_container, supplied_args, supplied_kwargs)
-                kwargs = invocation_container._infer_dependencies(
-                    spec,
-                    suppress_error=True,
-                    keys_to_skip=final_keys_to_skip,
-                    skip_pos_up_to=final_skip_pos_up_to,
-                )
-            kwargs.update(supplied_kwargs)
-            return supplied_args, kwargs
+            pass
 
         return apply_argument_updater(func, _update_args, spec, catch_errors=True)
 
@@ -528,7 +505,7 @@ class EmptyDefinitionSet(DefinitionsSource):
 
     @property
     def defined_types(self) -> Set[Type]:
-        return set()
+        pass
 
 
 class _TemporaryInjectionContext:
@@ -555,4 +532,4 @@ class _TemporaryInjectionContext:
 
 
 def _update_nothing(_c: WriteableContainer, _a: typing.Collection, _k: Dict):
-    return None
+    pass

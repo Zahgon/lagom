@@ -41,9 +41,7 @@ def bind_to_container(
     container: Container, shared: Optional[List[Type]] = None
 ) -> Callable[[Callable[..., R]], Callable[..., R]]:
     def _decorator(func):
-        if not isinstance(func, FunctionType):
-            raise ClassesCannotBeDecorated()
-        return wraps(func)(container.partial(func, shared=shared))
+        pass
 
     return _decorator
 
@@ -64,9 +62,7 @@ def magic_bind_to_container(
     """
 
     def _decorator(func):
-        if not isinstance(func, FunctionType):
-            raise ClassesCannotBeDecorated()
-        return wraps(func)(container.magic_partial(func, shared=shared))
+        pass
 
     return _decorator
 
@@ -87,13 +83,7 @@ def dependency_definition(container: Container, singleton: bool = False):
     """
 
     def _decorator(func):
-        definition_func, return_type = _extract_definition_func_and_type(func)  # type: ignore
-
-        if singleton:
-            container.define(return_type, Singleton(definition_func))
-        else:
-            container.define(return_type, definition_func)
-        return func
+        pass
 
     return _decorator
 
@@ -123,18 +113,7 @@ def context_dependency_definition(container: Container):
     """
 
     def _decorator(func):
-        if not inspect.isgeneratorfunction(func) and not inspect.isasyncgenfunction(
-            func
-        ):
-            raise InvalidDependencyDefinition(
-                "context_dependency_definition must be given a generator"
-            )
-        dep_type = _generator_type(reflect(func).return_type)
-        if inspect.isgeneratorfunction(func):
-            container.define(ContextManager[dep_type], contextmanager(func))  # type: ignore
-        if inspect.isasyncgenfunction(func):
-            container.define(AsyncContextManager[dep_type], asynccontextmanager(func))  # type: ignore
-        return func
+        pass
 
     return _decorator
 

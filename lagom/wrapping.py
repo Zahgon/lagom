@@ -18,15 +18,13 @@ def apply_argument_updater(
 
         @functools.wraps(func)
         async def _bound_func(*args, **kwargs):
-            bound_args, bound_kwargs = argument_updater(args, kwargs)
-            return await inner_func(*bound_args, **bound_kwargs)
+            pass
 
     else:
 
         @functools.wraps(func)
         def _bound_func(*args, **kwargs):
-            bound_args, bound_kwargs = argument_updater(args, kwargs)
-            return inner_func(*bound_args, **bound_kwargs)
+            pass
 
     return _bound_func
 
@@ -42,15 +40,6 @@ def _wrap_func_in_error_handling(func, spec: FunctionSpec):
 
     @functools.wraps(func)
     def _error_handling_func(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except TypeError as error:
-            # if it wasn't in kwargs the container couldn't build it
-            unresolvable_deps = [
-                dep_type
-                for (name, dep_type) in spec.annotations.items()
-                if name not in kwargs.keys()
-            ]
-            raise UnableToInvokeBoundFunction(str(error), unresolvable_deps)
+        pass
 
     return _error_handling_func

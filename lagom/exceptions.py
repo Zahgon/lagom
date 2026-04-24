@@ -114,17 +114,7 @@ class UnresolvableType(ValueError, LagomException):
 
     def get_unresolvable_deps_sequence(self) -> typing.List[str]:
         """Returns the dependency stack with the last element being the dependency source of the exception"""
-        error: typing.Optional[BaseException] = self
-        unresolvable_deps: typing.List[str] = []
-
-        for _loop_guard in range(100):
-            if not (error and isinstance(error, UnresolvableType)):
-                return unresolvable_deps
-            unresolvable_deps.append(error.dep_type)
-            error = error.__cause__
-        # This should never happen
-        unresolvable_deps.append("...")
-        return unresolvable_deps
+        pass
 
 
 class TypeResolutionBlocked(UnresolvableType):
@@ -220,10 +210,4 @@ class MissingFeature(LagomException):
 
 
 def _dep_type_as_string(dep_type: Type):
-    if hasattr(typing, "get_origin") and typing.get_origin(dep_type) is not None:  # type: ignore
-        # repr() gives a more sensible output in version 3.10 for List[X] and others like this
-        return repr(dep_type)
-    elif hasattr(dep_type, "__name__"):
-        return dep_type.__name__
-
-    return str(dep_type)
+    pass

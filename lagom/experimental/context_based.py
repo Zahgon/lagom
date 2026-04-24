@@ -123,12 +123,7 @@ class AsyncContextContainer(Container):
             )
 
         async def _with_context(*args, **kwargs):
-            async with self as c:
-                # TODO: Try and move this partial outside the function as this is expensive
-                base_partial = super(AsyncContextContainer, c).partial(
-                    func, shared, container_updater
-                )
-                return await base_partial(*args, **kwargs)  # type: ignore
+            pass
 
         return _with_context
 
@@ -146,31 +141,12 @@ class AsyncContextContainer(Container):
             )
 
         async def _with_context(*args, **kwargs):
-            async with self as c:
-                # TODO: Try and move this partial outside the function as this is expensive
-                base_partial = super(AsyncContextContainer, c).magic_partial(
-                    func, shared, keys_to_skip, skip_pos_up_to, container_updater
-                )
-                return await base_partial(*args, **kwargs)  # type: ignore
+            pass
 
         return _with_context
 
     def _context_type_def(self, dep_type: Type):
-        type_def = self.get_definition(ContextManager[dep_type]) or self.get_definition(Iterator[dep_type]) or self.get_definition(Generator[dep_type, None, None]) or self.get_definition(AsyncGenerator[dep_type, None]) or self.get_definition(AsyncContextManager[dep_type])  # type: ignore
-        if type_def is None:
-            raise InvalidDependencyDefinition(
-                f"A ContextManager[{dep_type}] should be defined. "
-                f"This could be an Iterator[{dep_type}] or Generator[{dep_type}, None, None] "
-                f"with the @contextmanager decorator"
-            )
-        if isinstance(type_def, Alias):
-            # Without this we create a definition that points to
-            # itself.
-            type_def = copy(type_def)
-            type_def.skip_definitions = True
-        if self.get_definition(AsyncGenerator[dep_type, None]) or self.get_definition(AsyncContextManager[dep_type]):  # type: ignore
-            return AsyncConstructionWithContainer(lambda c: self._async_context_resolver(c, type_def))  # type: ignore
-        return ConstructionWithContainer(lambda c: self._context_resolver(c, type_def))  # type: ignore
+        pass
 
     def _context_resolver(self, c: ReadableContainer, type_def: SpecialDepDefinition):
         """
@@ -178,9 +154,7 @@ class AsyncContextContainer(Container):
         the value of the context manager from __enter__ and then places the
         __exit__ in this container's exit stack
         """
-        assert self.async_exit_stack, "Types can only be resolved within an async with"
-        context_manager = type_def.get_instance(c)
-        return self.async_exit_stack.enter_context(context_manager)
+        pass
 
     def _async_context_resolver(
         self, c: ReadableContainer, type_def: SpecialDepDefinition
@@ -190,15 +164,10 @@ class AsyncContextContainer(Container):
         the value of the context manager from __aenter__ and then places the
         __aexit__ in this container's exit stack
         """
-        assert self.async_exit_stack, "Types can only be resolved within an async with"
-        context_manager = type_def.get_instance(c)
-        return self.async_exit_stack.enter_async_context(context_manager)
+        pass
 
     def _singleton_type_def(self, dep_type: Type):
         """
         The same as context_type_def but acts as a singleton within this container
         """
-        type_def = self._context_type_def(dep_type)
-        if isinstance(type_def, AsyncConstructionWithContainer):
-            return AwaitableSingleton(type_def, self)
-        return SingletonWrapper(type_def)
+        pass

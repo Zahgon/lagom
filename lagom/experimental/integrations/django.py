@@ -103,7 +103,7 @@ class DjangoModel(Generic[M]):
 
         :return:
         """
-        return self.managers.objects
+        pass
 
     def new(self, **kwargs) -> M:
         """Equivalent to MyModel(**kwargs)
@@ -111,7 +111,7 @@ class DjangoModel(Generic[M]):
         :param kwargs:
         :return:
         """
-        return self.model(**kwargs)
+        pass
 
 
 class DjangoIntegration:
@@ -152,14 +152,7 @@ class DjangoIntegration:
         :param view:
         :return:
         """
-        if isinstance(view, types.FunctionType):
-            # Plain old function can be bound to the container
-            return self._container.partial(
-                view,
-                shared=self._request_singletons,
-                container_updater=_update_container_for_request,
-            )
-        return self._bind_view_methods_to_container(view)
+        pass
 
     def magic_bind_view(self, view):
         """
@@ -169,44 +162,14 @@ class DjangoIntegration:
         :param view:
         :return:
         """
-        if isinstance(view, types.FunctionType):
-            # Plain old function can be bound to the container
-            return self._container.magic_partial(
-                view,
-                shared=self._request_singletons,
-                skip_pos_up_to=1,
-                container_updater=_update_container_for_request,
-            )
-        return self._bind_view_methods_to_container(view, magic=True)
+        pass
 
     def _bind_view_methods_to_container(self, view, magic=False):
-        for method in View.http_method_names:
-            if hasattr(view, method):
-                if magic:
-                    bound_func = self._container.magic_partial(
-                        getattr(view, method),
-                        shared=self._request_singletons,
-                        skip_pos_up_to=1,
-                        container_updater=_update_container_for_request,
-                    )
-                else:
-                    bound_func = self._container.partial(
-                        getattr(view, method),
-                        shared=self._request_singletons,
-                        container_updater=_update_container_for_request,
-                    )
-                setattr(
-                    view,
-                    method,
-                    bound_func,
-                )
-        return view
+        pass
 
     @staticmethod
     def _load_settings():
-        from django.conf import settings
-
-        return settings
+        pass
 
 
 def _update_container_for_request(
@@ -214,7 +177,4 @@ def _update_container_for_request(
 ):
     # The first arg is probably a request.
     # lets make that available for injection
-    if len(call_args) > 0:
-        request = call_args[0]
-        if isinstance(request, HttpRequest):
-            container[HttpRequest] = PlainInstance(request)
+    pass

@@ -43,7 +43,7 @@ class FunctionSpec:
 
     def __repr__(self):
         def _arg_type_string(arg):
-            return self.annotations[arg].__name__ if arg in self.annotations else "?"
+            pass
 
         signature = ", ".join(_arg_type_string(arg) for arg in self.args)
         if self.return_type:
@@ -76,7 +76,7 @@ class CachingReflector:
         Removed since lru cache is now used
         :return:
         """
-        return {"hidden": ""}
+        pass
 
     @lru_cache(maxsize=1024)
     def get_function_spec(self, func) -> FunctionSpec:

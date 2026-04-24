@@ -63,15 +63,7 @@ class StarletteIntegration:
         :param include_in_schema:
         :return:
         """
-        wrapped = self.wrapped_endpoint_factory(endpoint, self._container.partial)
-
-        return Route(
-            path,
-            wrapped,
-            methods=methods,
-            name=name,
-            include_in_schema=include_in_schema,
-        )
+        pass
 
     def magic_route(
         self,
@@ -92,15 +84,7 @@ class StarletteIntegration:
         :param include_in_schema:
         :return:
         """
-        wrapped = self.wrapped_endpoint_factory(endpoint, self._container.magic_partial)
-
-        return Route(
-            path,
-            wrapped,
-            methods=methods,
-            name=name,
-            include_in_schema=include_in_schema,
-        )
+        pass
 
     def ws_route(
         self,
@@ -117,9 +101,7 @@ class StarletteIntegration:
         :param name:
         :return:
         """
-        wrapped = self.wrapped_endpoint_factory(endpoint, self._container.partial)
-
-        return WebSocketRoute(path, wrapped, name=name)
+        pass
 
     def ws_magic_route(
         self,
@@ -136,9 +118,7 @@ class StarletteIntegration:
         :param name:
         :return:
         """
-        wrapped = self.wrapped_endpoint_factory(endpoint, self._container.magic_partial)
-
-        return WebSocketRoute(path, wrapped, name=name)
+        pass
 
     def wrapped_endpoint_factory(
         self, endpoint: Union[Callable, Type[HTTPEndpoint]], partial_provider: Callable
@@ -149,18 +129,7 @@ class StarletteIntegration:
         :param endpoint:
         :param partial_provider:
         """
-        if not isinstance(endpoint, type):
-            return partial_provider(endpoint, shared=self._request_singletons)
-
-        if issubclass(endpoint, HTTPEndpoint):
-            return self.create_http_endpoint_proxy(
-                endpoint, partial_provider, self._request_singletons
-            )
-
-        if issubclass(endpoint, WebSocketEndpoint):
-            return self.create_websocket_endpoint_proxy(
-                endpoint, partial_provider, self._request_singletons
-            )
+        pass
 
     @staticmethod
     def create_http_endpoint_proxy(
@@ -175,22 +144,7 @@ class StarletteIntegration:
         :param partial_provider:
         :param request_singletons:
         """
-
-        class HTTPEndpointProxy(HTTPEndpoint):
-            def __init__(self, scope, receive, send):
-                super().__init__(scope, receive, send)
-                self.endpoint = endpoint_cls(scope, receive, send)
-
-            def __getattribute__(self, name: str):
-                if name in OVERRIDE_HTTP_METHODS:
-                    endpoint_instance = object.__getattribute__(self, "endpoint")
-                    endpoint_method = getattr(endpoint_instance, name)
-
-                    return partial_provider(endpoint_method, shared=request_singletons)
-
-                return object.__getattribute__(self, name)
-
-        return HTTPEndpointProxy
+        pass
 
     @staticmethod
     def create_websocket_endpoint_proxy(
@@ -205,19 +159,4 @@ class StarletteIntegration:
         :param partial_provider:
         :param request_singletons:
         """
-
-        class WebSocketEndpointProxy(WebSocketEndpoint):
-            def __init__(self, scope, receive, send):
-                super().__init__(scope, receive, send)
-                self.endpoint = endpoint_cls(scope, receive, send)
-
-            def __getattribute__(self, name: str):
-                if name in OVERRIDE_WEBSOCKET_METHODS:
-                    endpoint_instance = object.__getattribute__(self, "endpoint")
-                    endpoint_method = getattr(endpoint_instance, name)
-
-                    return partial_provider(endpoint_method, shared=request_singletons)
-
-                return object.__getattribute__(self, name)
-
-        return WebSocketEndpointProxy
+        pass

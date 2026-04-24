@@ -26,7 +26,7 @@ class ClickIO:
 
     @staticmethod
     def echo(message=None, file=None, nl=True, err=False, color=None):
-        utils.echo(message, file, nl, err, color)
+        pass
 
     def __getattr__(self, item):
         import click
@@ -65,10 +65,7 @@ class ClickIntegration:
         """
 
         def _decorator(f):
-            bound_f = self._container.partial(f, shared=self._execution_singletons)
-            command = decorators.command(name, cls, **attrs)(bound_f)
-            setattr(command, "plain_function", bound_f)
-            return command
+            pass
 
         return _decorator
 
@@ -80,7 +77,7 @@ class ClickIntegration:
         :param attrs:
         :return:
         """
-        return decorators.option(*param_decls, **attrs)
+        pass
 
     @staticmethod
     def argument(*param_decls, **attrs):

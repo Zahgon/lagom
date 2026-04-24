@@ -42,34 +42,10 @@ class FlaskBlueprintIntegration(FlaskIntegration):
         Injectable arguments should be set by making the default value
         lagom.injectable
         """
-
-        def _decorator(f):
-            endpoint = options.pop("endpoint", f.__name__)
-            if f not in self._injection_map:
-                self._injection_map[f] = self._container.partial(
-                    f, shared=self._request_singletons
-                )
-            self.blueprint.add_url_rule(
-                rule, endpoint, self._injection_map[f], **options
-            )
-            return f
-
-        return _decorator
+        pass
 
     def magic_route(self, rule, **options):
         """Equivalent to the flask @route decorator
         The injection container will try and bind all arguments
         """
-
-        def _decorator(f):
-            endpoint = options.pop("endpoint", f.__name__)
-            if f not in self._injection_map:
-                self._injection_map[f] = self._container.magic_partial(
-                    f, shared=self._request_singletons
-                )
-            self.blueprint.add_url_rule(
-                rule, endpoint, self._injection_map[f], **options
-            )
-            return f
-
-        return _decorator
+        pass

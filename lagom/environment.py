@@ -96,11 +96,7 @@ class Env(ABC, BaseModel):
             ) from validation_error
 
     def _env_names_from_pydantic_errors(self, missing_field_errors):
-        return [
-            f"{self._prefix()}{pyd_error['loc'][0]}".upper()
-            for pyd_error in missing_field_errors
-        ]
+        pass
 
     def _prefix(self):
-        prefix = f"{self.PREFIX}_" if self.PREFIX else ""
-        return prefix
+        pass

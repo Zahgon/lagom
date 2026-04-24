@@ -202,7 +202,7 @@ class SingletonWrapper(SpecialDepDefinition[X]):
 
     @property
     def _has_instance(self) -> bool:
-        return self._instance is not None
+        pass
 
     def _load_instance(self, container):
         try:

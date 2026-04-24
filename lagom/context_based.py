@@ -106,12 +106,7 @@ class ContextContainer(Container):
         container_updater: Optional[CallTimeContainerUpdate] = None,
     ) -> Callable[..., X]:
         def _with_context(*args, **kwargs):
-            with self as c:
-                # TODO: Try and move this partial outside the function as this is expensive
-                base_partial = super(ContextContainer, c).partial(
-                    func, shared, container_updater
-                )
-                return base_partial(*args, **kwargs)
+            pass
 
         return _with_context
 
@@ -124,35 +119,18 @@ class ContextContainer(Container):
         container_updater: Optional[CallTimeContainerUpdate] = None,
     ) -> Callable[..., X]:
         def _with_context(*args, **kwargs):
-            with self as c:
-                # TODO: Try and move this partial outside the function as this is expensive
-                base_partial = super(ContextContainer, c).magic_partial(
-                    func, shared, keys_to_skip, skip_pos_up_to, container_updater
-                )
-                return base_partial(*args, **kwargs)
+            pass
 
         return _with_context
 
     def _context_type_def(self, dep_type: Type):
-        type_def = self.get_definition(ContextManager[dep_type]) or self.get_definition(Iterator[dep_type]) or self.get_definition(Generator[dep_type, None, None])  # type: ignore
-        if type_def is None:
-            raise InvalidDependencyDefinition(
-                f"A ContextManager[{dep_type}] should be defined. "
-                f"This could be an Iterator[{dep_type}] or Generator[{dep_type}, None, None] "
-                f"with the @contextmanager decorator"
-            )
-        if isinstance(type_def, Alias):
-            # Without this we create a definition that points to
-            # itself.
-            type_def = copy(type_def)
-            type_def.skip_definitions = True
-        return ConstructionWithContainer(lambda c: self._context_resolver(c, type_def))  # type: ignore
+        pass
 
     def _singleton_type_def(self, dep_type: Type):
         """
         The same as context_type_def but acts as a singleton within this container
         """
-        return SingletonWrapper(self._context_type_def(dep_type))
+        pass
 
     def _context_resolver(self, c: ReadableContainer, type_def: SpecialDepDefinition):
         """
@@ -160,6 +138,4 @@ class ContextContainer(Container):
         the value of the context manager from __enter__ and then places the
         __exit__ in this container's exit stack
         """
-        assert self.exit_stack, "Types can only be resolved within a with"
-        context_manager = cast(ContextManager, type_def.get_instance(c))
-        return self.exit_stack.enter_context(context_manager)
+        pass
